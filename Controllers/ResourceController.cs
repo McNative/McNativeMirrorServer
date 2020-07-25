@@ -220,6 +220,8 @@ namespace MirrorServer.Controllers
 
             string path = Path.Combine(_rootPath, result.PublicId, "resource-" + version.Id + "-" + edition0.Id + ".jar");
 
+            string directory = Path.Combine(_rootPath, result.PublicId);
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
             FileStream stream = System.IO.File.OpenWrite(path);
             await upload.CopyToAsync(stream);
