@@ -20,5 +20,8 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
+
 COPY startup.sh /app/startup.sh
+RUN ["chmod", "+x", "/app/startup.sh"]
+
 ENTRYPOINT ["/app/startup.sh"]
