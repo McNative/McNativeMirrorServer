@@ -20,4 +20,5 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-ENTRYPOINT ["dotnet", "dev-certs","https","--trust"]
+COPY startup.sh /app/startup.sh
+ENTRYPOINT ["startup.sh"]
