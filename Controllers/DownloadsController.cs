@@ -32,7 +32,7 @@ namespace MirrorServer.Controllers
         [HttpGet("{name}/{edition}")]
         public async Task<ActionResult> download(string name, string edition)
         {
-            Resource result = _context.Resources.SingleOrDefault(resource => resource.Name.Equals(name));
+            Resource result = _context.Resources.SingleOrDefault(resource => resource.Name.ToLower().Equals(name.ToLower()));
             if (result == null)
             {
                 return NotFound();
@@ -50,13 +50,13 @@ namespace MirrorServer.Controllers
                 }
             }
 
-            ResourceVersion version = result.Versions.Where(version => version.Qualifier.Equals("RELEASE")).OrderByDescending(version => version.BuildNumber).FirstOrDefault();
+            ResourceVersion version = result.Versions.Where(version => version.Qualifier == "RELEASE").OrderByDescending(version => version.BuildNumber).FirstOrDefault();
             if (version == null)
             {
                 return NotFound();
             }
 
-            ResourceEdition edition0 = result.Editions.Where(edition0 => string.Equals(edition0.Name, edition)).FirstOrDefault();
+            ResourceEdition edition0 = result.Editions.Where(edition0 => edition0.Name.ToLower().Equals(edition)).FirstOrDefault();
             if (edition0 == null || !edition0.IsAvailableAsDownload)
             {
                 return NotFound();
