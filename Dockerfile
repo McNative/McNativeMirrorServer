@@ -20,5 +20,5 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-CMD dotnet dev-certs https --trust
+RUN dotnet dev-certs https --trust
 ENTRYPOINT ["dotnet", "McNativeMirrorServer.dll"]
