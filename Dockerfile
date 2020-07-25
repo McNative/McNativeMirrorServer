@@ -20,6 +20,5 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-WORKDIR /
 COPY startup.sh /app/startup.sh
-ENTRYPOINT ["startup.sh"]
+ENTRYPOINT ["/app/startup.sh"]
