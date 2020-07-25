@@ -1,0 +1,30 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:64379",
+      "sslPort": 44332
+    }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "PRETRONIC_DATABASE": " Server=deyna.ch;Port=5432;Database=postgres;User ID=mirror;Password=\"&.aNnpodiUl9pBcFP6-4SisiSTEj&EwYt\";Pooling=true",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "McNativeMirrorServer": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "api/values",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    }
+  }
+}
