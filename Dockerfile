@@ -20,6 +20,5 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-COPY ./startup.sh /app/
-
-ENTRYPOINT ["startup.sh"]
+CMD dotnet dev-certs https --trust
+ENTRYPOINT ["dotnet", "McNativeMirrorServer.dll"]
