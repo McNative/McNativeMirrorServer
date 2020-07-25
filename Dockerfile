@@ -21,4 +21,3 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 ENTRYPOINT ["dotnet", "dev-certs","https","--trust"]
-ENTRYPOINT ["dotnet", "McNativeMirrorServer.dll"]
