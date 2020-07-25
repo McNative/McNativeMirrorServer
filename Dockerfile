@@ -12,7 +12,6 @@ RUN dotnet restore "./McNativeMirrorServer.csproj"
 COPY . .
 WORKDIR "/src/."
 RUN dotnet build "McNativeMirrorServer.csproj" -c Release -o /app/build
-RUN dotnet dev-certs https --trust
 
 
 FROM build AS publish
@@ -23,6 +22,6 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-COPY startup.sh /app/startup.sh
+COPY certificate/cert.pfx  /app/certificate/cert.pfx
 
-ENTRYPOINT ["sh", "/app/startup.sh"]
+ENTRYPOINT ["dotnet", "McNativeMirrorServer.dll"]
