@@ -13,7 +13,7 @@ namespace McNativeMirrorServer
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
         WebHost.CreateDefaultBuilder(args)
             .UseIISIntegration()
-            .UseUrls("http://0.0.0.0:80")
+            .UseUrls("https://0.0.0.0:443")
             .UseStartup<Startup>();
     }
 }
