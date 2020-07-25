@@ -12,15 +12,16 @@ RUN dotnet restore "./McNativeMirrorServer.csproj"
 COPY . .
 WORKDIR "/src/."
 RUN dotnet build "McNativeMirrorServer.csproj" -c Release -o /app/build
+RUN dotnet dev-certs https --trust
+
 
 FROM build AS publish
 RUN dotnet publish "McNativeMirrorServer.csproj" -c Release -o /app/publish
 
+
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
-RUN dotnet dev-certs https --trust
 
 COPY startup.sh /app/startup.sh
 
