@@ -13,7 +13,7 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "PRETRONIC_DATABASE": " Server=deyna.ch;Port=5432;Database=postgres;User ID=mirror;Password=\"&.aNnpodiUl9pBcFP6-4SisiSTEj&EwYt\";Pooling=true",
+        "PRETRONIC_DATABASE": " Server=192.168.1.14;Port=3306;Database=mcnative;User=mcnative-mirror-server;Password=\"JCe0F2KKKB6?6GGebuLm-0(uemK)F+HM*B\";Pooling=true",
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },

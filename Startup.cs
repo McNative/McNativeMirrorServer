@@ -23,7 +23,7 @@ namespace McNativeMirrorServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ResourceContext>(options => options.UseLazyLoadingProxies().UseNpgsql(Environment.GetEnvironmentVariable("PRETRONIC_DATABASE")));
+            services.AddDbContext<ResourceContext>(options => options.UseLazyLoadingProxies().UseMySql(Environment.GetEnvironmentVariable("PRETRONIC_DATABASE")));
             services.AddControllers().AddNewtonsoftJson(options => {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
