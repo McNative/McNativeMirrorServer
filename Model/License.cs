@@ -9,7 +9,7 @@ namespace McNativeMirrorServer.Model
 {
     public class License
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public string UserId { get; set; }
 
