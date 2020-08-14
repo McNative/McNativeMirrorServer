@@ -28,7 +28,6 @@ namespace MirrorServer.Controllers
             return download(name, null);
         }
 
-
         [HttpGet("{name}/{edition}")]
         public async Task<ActionResult> download(string name, string edition)
         {

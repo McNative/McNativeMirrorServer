@@ -1,9 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace McNativeMirrorServer.Model
 {
@@ -13,8 +10,6 @@ namespace McNativeMirrorServer.Model
 
         public string UserId { get; set; }
 
-        public string ServerId { get; set; }
-
         public int ResourceId { get; set; }
 
         public bool Disabled { get; set; }
@@ -23,17 +18,15 @@ namespace McNativeMirrorServer.Model
 
         public DateTime? Registered { get; set; }
 
+        public DateTime? ActivationTime { get; set; }
+
         public int MaxInstances { get; set; }
 
         [ForeignKey("ResourceId")]
         public virtual Resource Resource { get; set; }
 
         [JsonIgnore]
-        [ForeignKey("ServerId")]
-        public virtual Server? Server { get; set; }
-
-
-       // [InverseProperty("License")]
-        //public virtual ICollection<ActiveLicense> ActiveLicenses { get; set; }
+        [ForeignKey("OrganisationId")]
+        public virtual Organisation? Organisation { get; set; }
     }
 }

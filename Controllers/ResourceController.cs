@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
@@ -43,8 +44,9 @@ namespace MirrorServer.Controllers
 
 
         [HttpGet("{resourceId}/versions/")]
-        public ActionResult GetVersions(string resourceId)
+        public ActionResult GetVersions(string resourceId, string qualifier, int limit)
         {
+            if (limit == 0) limit = 150;
             Resource result = _context.Resources.SingleOrDefault(resource => resource.PublicId.Equals(resourceId));
 
             if (result == null)
@@ -52,7 +54,11 @@ namespace MirrorServer.Controllers
                 return NotFound();
             }
 
-            return Ok(result.Versions);
+            IEnumerable<ResourceVersion> versions = result.Versions;
+            if(qualifier != null) versions = versions.Where(v => v.Qualifier == qualifier);
+            versions = versions.Take(limit);
+
+            return Ok(versions);
         }
 
         [HttpGet("{resourceId}/editions/")]
@@ -112,9 +118,10 @@ namespace MirrorServer.Controllers
             return Ok(latest);
         }
 
-
         [HttpGet("{resourceId}/versions/{buildId}/download")]
-        public async Task<ActionResult> DownloadVersion(string resourceId,int buildId,string edition, [FromHeader] string serverId, [FromHeader] string serverSecret)
+        public async Task<ActionResult> DownloadVersion(string resourceId,int buildId,string edition
+            ,[FromHeader] string serverId, [FromHeader] string serverSecret
+            ,[FromHeader] string rolloutId, [FromHeader] string rolloutSecret)
         {
             Resource resource = _context.Resources.SingleOrDefault(resource => resource.PublicId.Equals(resourceId));
             if (resource == null)
@@ -124,19 +131,28 @@ namespace MirrorServer.Controllers
 
             if(resource.Licensed)
             {
-                if(serverSecret == null || serverId == null)
+                Organisation organisation = null;
+                if(rolloutId != null)
                 {
-                    return Unauthorized("Server id or secret is missing");
+                    if(rolloutSecret == null) return Unauthorized("Rollout id or secret is missing");
+                    RolloutServer server = _context.RolloutServers.SingleOrDefault(server => server.Id == rolloutId);
+                    if (server == null || !server.Secret.Equals(rolloutSecret)) return Unauthorized("Invalid server id or secret");
+                    organisation = server.Organisation;
+                }
+                else if(serverId != null)
+                {
+                    if(serverSecret == null) return Unauthorized("Server id or secret is missing");
+                    Server server = _context.Servers.SingleOrDefault(server => server.Id == serverId);
+                    if (server == null || !server.Secret.Equals(serverSecret)) return Unauthorized("Invalid server id or secret");
+                    organisation = server.Organisation;
+                }
+                else
+                {
+                    return Unauthorized("Missing authentication credentials");
                 }
 
-                Server server = _context.Servers.SingleOrDefault(server => server.Id == serverId);
 
-                if(server == null || !server.Secret.Equals(serverSecret))
-                {
-                    return Unauthorized("Invalid server id or secret");
-                }
-
-                License license = server.Licenses.SingleOrDefault(license => license.ResourceId == resource.Id);
+                License license = organisation.Licenses.FirstOrDefault(license => license.ResourceId == resource.Id);
 
                 if(license == null || license.Disabled || (license.Expiry != null && license.Expiry < DateTime.Now))
                 {
@@ -159,6 +175,11 @@ namespace MirrorServer.Controllers
             }
 
             string path = Path.Combine(_rootPath, resource.PublicId, "resource-" + version.Id + "-" + edition0.Id + ".jar");
+
+            if (!System.IO.File.Exists(path))
+            {
+                return NotFound();
+            }
 
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))

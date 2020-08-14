@@ -7,21 +7,15 @@ using System.Threading.Tasks;
 
 namespace McNativeMirrorServer.Model
 {
-    public class Server
+    public class Organisation
     {
         public string Id { get; set; }
 
-        public string OrganisationId { get; set; }
-
         public string Name { get; set; }
 
-        public string PublicIp { get; set; }
+        public string Description { get; set; }
 
-        [JsonIgnore]
-        public string Secret { get; set; }
-
-        [JsonIgnore]
-        [ForeignKey("OrganisationId")]
-        public virtual Organisation? Organisation { get; set; }
+        [InverseProperty("Organisation")]
+        public virtual ICollection<License> Licenses { get; set; }
     }
 }

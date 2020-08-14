@@ -13,6 +13,10 @@ namespace McNativeMirrorServer.Model
 
         public DbSet<Server> Servers { get; set; }
 
+        public DbSet<RolloutServer> RolloutServers { get; set; }
+
+        public DbSet<Organisation> Organisations { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("mcnative");
@@ -21,6 +25,8 @@ namespace McNativeMirrorServer.Model
             modelBuilder.Entity<ResourceVersion>().ToTable("mcnative_resource_versions");
             modelBuilder.Entity<ResourceEdition>().ToTable("mcnative_resource_editions");
             modelBuilder.Entity<License>().ToTable("mcnative_license");
+            modelBuilder.Entity<Organisation>().ToTable("mcnative_organisation");
+            modelBuilder.Entity<RolloutServer>().ToTable("mcnative_organisation_rollout_servers");
         }
 
     }

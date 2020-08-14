@@ -1,13 +1,9 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace McNativeMirrorServer.Model
 {
-    public class Server
+    public class RolloutServer
     {
         public string Id { get; set; }
 
@@ -15,13 +11,11 @@ namespace McNativeMirrorServer.Model
 
         public string Name { get; set; }
 
-        public string PublicIp { get; set; }
-
         [JsonIgnore]
         public string Secret { get; set; }
 
         [JsonIgnore]
         [ForeignKey("OrganisationId")]
-        public virtual Organisation? Organisation { get; set; }
+        public virtual Organisation Organisation { get; set; }
     }
 }
