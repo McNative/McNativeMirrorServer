@@ -54,7 +54,7 @@ namespace MirrorServer.Controllers
                 return NotFound();
             }
 
-            IEnumerable<ResourceVersion> versions = result.Versions;
+            IEnumerable<ResourceVersion> versions = result.Versions.OrderByDescending(t => t.BuildNumber);
             if(qualifier != null) versions = versions.Where(v => v.Qualifier == qualifier);
             versions = versions.Take(limit);
 
