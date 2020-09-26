@@ -10,6 +10,8 @@ namespace McNativeMirrorServer.Model
         public DbSet<ResourceVersion> ResourceVersions { get; set; }
 
         public DbSet<License> Licenses { get; set; }
+        
+        public DbSet<LicenseActive> LicenceActives { get; set; }
 
         public DbSet<Server> Servers { get; set; }
 
@@ -25,6 +27,7 @@ namespace McNativeMirrorServer.Model
             modelBuilder.Entity<ResourceVersion>().ToTable("mcnative_resource_versions");
             modelBuilder.Entity<ResourceEdition>().ToTable("mcnative_resource_editions");
             modelBuilder.Entity<License>().ToTable("mcnative_license");
+            modelBuilder.Entity<LicenseActive>().ToTable("mcnative_license_active");
             modelBuilder.Entity<Organisation>().ToTable("mcnative_organisation");
             modelBuilder.Entity<RolloutServer>().ToTable("mcnative_organisation_rollout_servers");
         }
