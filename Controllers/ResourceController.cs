@@ -131,7 +131,7 @@ namespace MirrorServer.Controllers
 
             if(resource.Licensed)
             {
-                Organisation organisation = null;
+                Organisation organisation;
                 if(rolloutId != null)
                 {
                     if(rolloutSecret == null) return Unauthorized("Rollout id or secret is missing");

@@ -11,6 +11,9 @@ namespace McNativeMirrorServer.Model
         public int Id { get; set; }
         public string PublicId { get; set; }
         public string Name { get; set; }
+
+        public string PrivateKey { get; set; }
+        public int? SpigotMcResourceId { get; set; }
         public string DefaultDownloadEdition { get; set; }
 
         public bool Licensed { get; set; }
