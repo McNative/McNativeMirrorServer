@@ -61,7 +61,7 @@ namespace MirrorServer.Controllers
                 return NotFound();
             }
 
-            string path = Path.Combine(_rootPath, result.PublicId, "resource-" + version.Id + "-" + edition0.Id + ".jar");
+            string path = Path.Combine(_rootPath, result.Id, "resource-" + version.Id + "-" + edition0.Id + ".jar");
 
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))

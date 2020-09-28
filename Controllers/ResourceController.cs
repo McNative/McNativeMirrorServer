@@ -32,7 +32,7 @@ namespace MirrorServer.Controllers
         [HttpGet("{resourceId}")]
         public ActionResult Get(string resourceId)
         {
-            Resource result = _context.Resources.SingleOrDefault(resource => resource.PublicId.Equals(resourceId));
+            Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
 
             if (result == null)
             {
@@ -47,7 +47,7 @@ namespace MirrorServer.Controllers
         public ActionResult GetVersions(string resourceId, string qualifier, int limit)
         {
             if (limit == 0) limit = 150;
-            Resource result = _context.Resources.SingleOrDefault(resource => resource.PublicId.Equals(resourceId));
+            Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
 
             if (result == null)
             {
@@ -64,7 +64,7 @@ namespace MirrorServer.Controllers
         [HttpGet("{resourceId}/editions/")]
         public ActionResult GetEditions(string resourceId)
         {
-            Resource result = _context.Resources.SingleOrDefault(resource => resource.PublicId.Equals(resourceId));
+            Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
 
             if (result == null)
             {
@@ -77,7 +77,7 @@ namespace MirrorServer.Controllers
         [HttpGet("{resourceId}/versions/latest")]
         public ActionResult getLatestVersion(string resourceId, bool plain, string qualifier, bool stable, bool beta)
         {
-            Resource result = _context.Resources.SingleOrDefault(resource => resource.PublicId.Equals(resourceId));
+            Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
 
             if (result == null)
             {
@@ -123,7 +123,7 @@ namespace MirrorServer.Controllers
             ,[FromHeader] string serverId, [FromHeader] string serverSecret
             ,[FromHeader] string rolloutId, [FromHeader] string rolloutSecret)
         {
-            Resource resource = _context.Resources.SingleOrDefault(resource => resource.PublicId.Equals(resourceId));
+            Resource resource = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
             if (resource == null)
             {
                 return NotFound();
@@ -174,7 +174,7 @@ namespace MirrorServer.Controllers
                 return NotFound();
             }
 
-            string path = Path.Combine(_rootPath, resource.PublicId, "resource-" + version.Id + "-" + edition0.Id + ".jar");
+            string path = Path.Combine(_rootPath, resource.Id, "resource-" + version.Id + "-" + edition0.Id + ".jar");
 
             if (!System.IO.File.Exists(path))
             {
@@ -197,7 +197,7 @@ namespace MirrorServer.Controllers
         {
             if (!_token.Equals(token))return Unauthorized();
 
-            Resource result = _context.Resources.SingleOrDefault(resource => resource.PublicId.Equals(resourceId));
+            Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
             if (result == null)
             {
                 return NotFound();
@@ -221,7 +221,7 @@ namespace MirrorServer.Controllers
         {
             if (!_token.Equals(token)) return Unauthorized();
 
-            Resource result = _context.Resources.SingleOrDefault(resource => resource.PublicId.Equals(resourceId));
+            Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
             if (result == null)
             {
                 return NotFound();
@@ -239,9 +239,9 @@ namespace MirrorServer.Controllers
                 return NotFound();
             }
 
-            string path = Path.Combine(_rootPath, result.PublicId, "resource-" + version.Id + "-" + edition0.Id + ".jar");
+            string path = Path.Combine(_rootPath, result.Id, "resource-" + version.Id + "-" + edition0.Id + ".jar");
 
-            string directory = Path.Combine(_rootPath, result.PublicId);
+            string directory = Path.Combine(_rootPath, result.Id);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
             FileStream stream = System.IO.File.OpenWrite(path);

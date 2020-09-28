@@ -8,17 +8,11 @@ namespace McNativeMirrorServer.Model
     {
         public string Id { get; set; }
 
-        public string UserId { get; set; }
-
-        public int ResourceId { get; set; }
+        public string ResourceId { get; set; }
 
         public bool Disabled { get; set; }
 
         public DateTime? Expiry { get; set; }
-
-        public DateTime? Registered { get; set; }
-
-        public DateTime? ActivationTime { get; set; }
 
         public int MaxInstances { get; set; }
 
@@ -27,6 +21,6 @@ namespace McNativeMirrorServer.Model
 
         [JsonIgnore]
         [ForeignKey("OrganisationId")]
-        public virtual Organisation? Organisation { get; set; }
+        public virtual Organisation Organisation { get; set; }
     }
 }

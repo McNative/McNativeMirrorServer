@@ -7,10 +7,6 @@ namespace McNativeMirrorServer.Model
     {
         public string Id { get; set; }
 
-        public string OrganisationId { get; set; }
-
-        public string Name { get; set; }
-
         [JsonIgnore]
         public string Secret { get; set; }
 

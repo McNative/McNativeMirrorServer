@@ -46,7 +46,7 @@ namespace MirrorServer.Controllers
              *
              * License FIle signieren + Siginatur hinzufügen (private key mit base64)
              */
-            Resource resource = _context.Resources.SingleOrDefault(resource => resource.PublicId.Equals(resourceId));
+            Resource resource = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
             if (resource == null)
             {
                 return NotFound();

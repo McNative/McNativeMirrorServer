@@ -14,7 +14,7 @@ namespace McNativeMirrorServer.Model
         public string Name { get; set; }
 
         [JsonIgnore]
-        public int ResourceId { get; set; }
+        public string ResourceId { get; set; }
 
         public bool IsAvailableAsDownload { get; set; }
 

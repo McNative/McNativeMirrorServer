@@ -7,9 +7,7 @@ namespace McNativeMirrorServer.Model
     public class Resource
     {
 
-        [JsonIgnore]
-        public int Id { get; set; }
-        public string PublicId { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
 
         public string PrivateKey { get; set; }

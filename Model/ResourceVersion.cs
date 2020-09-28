@@ -10,7 +10,7 @@ namespace McNativeMirrorServer.Model
         public int Id { get; set; }
 
         [JsonIgnore]
-        public int? ResourceId { get; set; }
+        public string ResourceId { get; set; }
 
         public string Name { get; set; }
 
