@@ -14,6 +14,7 @@ namespace McNativeMirrorServer
         WebHost.CreateDefaultBuilder(args)
             .UseIISIntegration()
             .UseUrls("https://0.0.0.0:443")
+            .UseSentry("https://243559f4ee7f47f2b6c8514e97b6f551@o428820.ingest.sentry.io/5449626")
             .UseStartup<Startup>();
     }
 }
