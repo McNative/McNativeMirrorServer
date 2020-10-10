@@ -252,5 +252,69 @@ namespace MirrorServer.Controllers
             return Ok();
         }
 
+        [HttpPost("{resourceId}/deploy")]
+        public async Task<ActionResult> DeployResource(string resourceId, string name, string qualifier, string edition, int buildNumber, [FromForm(Name = "File")] IFormFile upload, [FromHeader] string secret)
+        {
+            Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
+            if (result == null)
+            {
+                return NotFound("Resource not found");
+            }
+
+            if (!result.DeploySecret.Equals(secret))
+            {
+                return Unauthorized("Invalid resource secret");
+            }
+
+            ResourceVersion version = result.Versions.FirstOrDefault(version => version.Name == name);
+            if (version == null)
+            { 
+                version = new ResourceVersion();
+                version.Name = name;
+                version.Qualifier = qualifier.ToUpper();
+                version.BuildNumber = buildNumber == -1 ? GetNextBuildNumber(resourceId) : buildNumber;
+                version.ResourceId = result.Id;
+                version.Time = DateTime.Now;
+
+                await _context.AddAsync(version);
+                await _context.SaveChangesAsync();
+            }
+            else if(!version.Qualifier.Equals(qualifier,StringComparison.InvariantCultureIgnoreCase) || (version.BuildNumber != -1 &&  version.BuildNumber != buildNumber))
+            {
+                return BadRequest("There is already an existing version with a different qualifier or build number");
+            }
+
+            ResourceEdition edition0 = result.Editions.FirstOrDefault(edition0 => edition0.Name == edition);
+            if (edition0 == null)
+            {
+                return NotFound("Edition "+edition+" does not exist (Please create a new edition in the McNative console)");
+            }
+
+            string path = Path.Combine(_rootPath, result.Id, "resource-" + version.Id + "-" + edition0.Id + ".jar");
+
+            string directory = Path.Combine(_rootPath, result.Id);
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+            FileStream stream = System.IO.File.OpenWrite(path);
+            await upload.CopyToAsync(stream);
+
+            stream.Close();
+
+            return Ok();
+        }
+
+        private int GetNextBuildNumber(string resourceId)
+        {
+            ResourceVersion version = _context.ResourceVersions.OrderByDescending(v => v.BuildNumber)
+                .FirstOrDefault(v => v.ResourceId == resourceId);
+
+            if (version == null)
+            {
+                return 1;
+            }
+
+            return version.BuildNumber+1;
+        }
+
     }
 }

@@ -15,6 +15,8 @@ namespace McNativeMirrorServer.Model
 
         public bool Licensed { get; set; }
 
+        public string DeploySecret { get; set; }
+
         [InverseProperty("Resource")]
         public virtual ICollection<ResourceVersion> Versions { get; set; }
 
