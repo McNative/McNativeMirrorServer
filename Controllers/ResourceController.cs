@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace MirrorServer.Controllers
 {
-    [Route("[controller]/v1/")]
+    [Route("resources/v1/")]
     [ApiController]
     public class ResourceController : ControllerBase
     {

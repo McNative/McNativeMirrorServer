@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -9,14 +8,13 @@ using McNativeMirrorServer;
 using McNativeMirrorServer.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
 
 namespace MirrorServer.Controllers
 {
-    [Route("[controller]/")]
+    [Route("resources/v1/licenses")]
     public class LicenseController : Controller
     {
         private readonly ResourceContext _context;
@@ -33,19 +31,6 @@ namespace MirrorServer.Controllers
         {
             RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
             string str = RSA.ToXmlString(true);
-            Console.WriteLine(str);
-            /*
-             * Credentials überprüfen -
-             *
-             * Lizenz prüfen (Hat er überhaupt eine / Expiry / Disabled etc.) -
-             *
-             * Lizenz austellen
-             * Insert Database (+ Request Informationen)
-             * 
-             * License File bauen
-             *
-             * License FIle signieren + Siginatur hinzufügen (private key mit base64)
-             */
             Resource resource = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
             if (resource == null)
             {
