@@ -67,7 +67,10 @@ namespace MirrorServer.Controllers
                 }
 
                 var now = DateTime.Now;
+
                 var expiry = now.AddDays(14);
+                if (license.Expiry != null && expiry > license.Expiry) expiry = license.Expiry.Value;
+
                 var preferredRefreshTime = now.AddDays(3);
 
                 LicenseActive activeLicense = await _context.LicenceActives.Where(a => a.DeviceId == deviceId).FirstOrDefaultAsync();
@@ -94,6 +97,7 @@ namespace MirrorServer.Controllers
                 await _context.SaveChangesAsync();
                 
                 var properties = new Properties();
+                properties.set("Id",activeLicense.Id);
                 properties.set("Issuer", "licensing.mcnative.org");
                 properties.set("CheckoutTime", now.Ticks);
                 properties.set("OrganisationId", organisation.Id);

@@ -75,7 +75,7 @@ namespace MirrorServer.Controllers
         }
 
         [HttpGet("{resourceId}/versions/latest")]
-        public ActionResult getLatestVersion(string resourceId, bool plain, string qualifier, bool stable, bool beta)
+        public ActionResult GetLatestVersion(string resourceId, bool plain, string qualifier, bool stable, bool beta)
         {
             Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
 
