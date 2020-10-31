@@ -24,7 +24,7 @@ namespace MirrorServer.Controllers
             _context = context;
         }
         
-        [HttpGet("{resourceId}/checkout")]//licensing.mcnative.org/<id>/checkout
+        [HttpGet("{resourceId}/checkout")]
         public async Task<IActionResult> Checkout(string resourceId, [FromHeader] string deviceId,
             [FromHeader] string serverId, [FromHeader] string serverSecret
             ,[FromHeader] string rolloutId, [FromHeader] string rolloutSecret)//ResourceId DeviceId // ServerId/Secret OR RolloutId/Secret
@@ -68,7 +68,7 @@ namespace MirrorServer.Controllers
 
                 var now = DateTime.Now;
 
-                var expiry = now.AddDays(14);
+                var expiry = now.AddDays(7);
                 if (license.Expiry != null && expiry > license.Expiry) expiry = license.Expiry.Value;
 
                 var preferredRefreshTime = now.AddDays(3);
@@ -116,7 +116,56 @@ namespace MirrorServer.Controllers
             }
             return BadRequest("Resource not licensed");
         }
-        
+
+        [HttpGet("{resourceId}/alive")]
+        public async Task<IActionResult> Alive(string resourceId, [FromHeader] string serverId, [FromHeader] string serverSecret)
+        {
+            if (serverId == null || serverSecret == null)
+            {
+                return Unauthorized("Server id or secret is missing");
+            }
+
+            Resource resource = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
+            if (resource == null) return NotFound();
+
+            if (resource.AliveReportingEnabled)
+            {
+                Server server = _context.Servers.SingleOrDefault(server => server.Id == serverId);
+                if (server == null || !server.Secret.Equals(serverSecret)) return Unauthorized("Invalid server id or secret");
+
+                int hour = DateTime.Now.Hour;
+                AliveReport report = await _context.AliveReports.FirstOrDefaultAsync(r => r.OrganisationId == server.OrganisationId 
+                        && r.ResourceId == resourceId && r.Hour == hour);
+
+                if (report == null)
+                {
+                    report = new AliveReport();
+                    report.OrganisationId = server.OrganisationId;
+                    report.ResourceId = resource.Id;
+                    report.FirstContact = DateTime.Now;
+                    report.LastContact = report.FirstContact;
+                    report.Hour = hour;
+                    report.Count = 1;
+                    await _context.AddAsync(report);
+                }
+                else
+                {
+                    if ((DateTime.Now-report.LastContact).Minutes < 8)
+                    {
+                        return BadRequest();
+                    }
+                    report.LastContact = DateTime.Now;
+                    report.Count += 1;
+                    _context.Update(report);
+                }
+
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+
+            return BadRequest("Resource not reportable");
+        }
+
         public static RSACryptoServiceProvider ImportPrivateKey(string pem) {
             PemReader pr = new PemReader(new StringReader(pem));
             RsaPrivateCrtKeyParameters KeyPair = (RsaPrivateCrtKeyParameters)pr.ReadObject();
