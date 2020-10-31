@@ -152,7 +152,7 @@ namespace MirrorServer.Controllers
                 {
                     if ((DateTime.Now-report.LastContact).Minutes < 8)
                     {
-                        return BadRequest();
+                        return Ok();
                     }
                     report.LastContact = DateTime.Now;
                     report.Count += 1;
