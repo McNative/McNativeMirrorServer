@@ -135,8 +135,8 @@ namespace MirrorServer.Controllers
 
                 int hour = DateTime.Now.Hour;
                 AliveReport report = await _context.AliveReports.FirstOrDefaultAsync(r => r.OrganisationId == server.OrganisationId 
-                        && r.ResourceId == resourceId && r.Hour == hour);
-
+                        && r.ResourceId == resourceId && r.FirstContact >= DateTime.Now && r.Hour == hour);
+                //@Todo check license
                 if (report == null)
                 {
                     report = new AliveReport();

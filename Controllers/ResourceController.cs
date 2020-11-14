@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using McNativeMirrorServer.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace MirrorServer.Controllers
@@ -221,7 +222,7 @@ namespace MirrorServer.Controllers
         {
             if (!_token.Equals(token)) return Unauthorized();
 
-            Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
+            Resource result = await _context.Resources.FirstOrDefaultAsync(resource => resource.Id.Equals(resourceId));//@Todo check for public
             if (result == null)
             {
                 return NotFound();
