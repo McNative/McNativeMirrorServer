@@ -8,9 +8,13 @@ namespace McNativeMirrorServer.Model
     {
         public string Id { get; set; }
 
+        public string OrganisationId { get; set; }
+
         public string ResourceId { get; set; }
 
         public bool Disabled { get; set; }
+
+        public string ManagedBySubscriptionId { get; set; }
 
         public DateTime? Expiry { get; set; }
 

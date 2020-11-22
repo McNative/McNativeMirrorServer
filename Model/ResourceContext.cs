@@ -10,8 +10,14 @@ namespace McNativeMirrorServer.Model
         public DbSet<ResourceVersion> ResourceVersions { get; set; }
 
         public DbSet<License> Licenses { get; set; }
-        
+
         public DbSet<LicenseActive> LicenceActives { get; set; }
+
+        public DbSet<Subscription> Subscriptions { get; set; }
+
+        public DbSet<SubscriptionActive> SubscriptionActives { get; set; }
+
+        public DbSet<SubscriptionResource> SubscriptionResources { get; set; }
 
         public DbSet<Server> Servers { get; set; }
 

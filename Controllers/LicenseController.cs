@@ -58,10 +58,9 @@ namespace MirrorServer.Controllers
                     return Unauthorized("Missing authentication credentials");
                 }
 
+                License license = await organisation.FindLicense(_context, resourceId);
 
-                License license = organisation.Licenses.FirstOrDefault(license => license.ResourceId == resource.Id);
-
-                if(license == null || license.Disabled || (license.Expiry != null && license.Expiry < DateTime.Now))
+                if(license == null)
                 {
                     return Unauthorized("Resource not licensed to server");
                 }

@@ -153,9 +153,9 @@ namespace MirrorServer.Controllers
                 }
 
 
-                License license = organisation.Licenses.FirstOrDefault(license => license.ResourceId == resource.Id);
+                License license = await organisation.FindLicense(_context, resourceId);
 
-                if(license == null || license.Disabled || (license.Expiry != null && license.Expiry < DateTime.Now))
+                if (license == null)
                 {
                     return Unauthorized("Resource not licensed to server");
                 }
