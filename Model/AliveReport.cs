@@ -14,6 +14,7 @@ namespace McNativeMirrorServer.Model
 
         public int Hour { get; set; }
 
+        public DateTime Date { get; set; }
         public DateTime FirstContact { get; set; }
 
         public DateTime LastContact { get; set; }
