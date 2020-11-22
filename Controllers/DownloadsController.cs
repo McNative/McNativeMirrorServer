@@ -52,7 +52,7 @@ namespace MirrorServer.Controllers
                 stream.Close();
             }
             memory.Position = 0;
-            return File(memory, MediaTypeNames.Application.Zip, result.Name.ToLower().Replace(" ", "_") + "-loader.jar");
+            return File(memory, MediaTypeNames.Application.Zip, result.Name.ToLower().Replace(" ", "_") + ".jar");
         }
     }
 }
