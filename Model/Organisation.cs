@@ -44,7 +44,8 @@ namespace McNativeMirrorServer.Model
                 ResourceId = resourceId,
                 Expiry = subscription.Expiry,
                 Disabled = false,
-                ManagedBySubscriptionId = subscription.SubscriptionId
+                ManagedBySubscriptionId = subscription.SubscriptionId,
+                MaxInstances = 10
             };
             await context.AddAsync(license);
             await context.SaveChangesAsync();
