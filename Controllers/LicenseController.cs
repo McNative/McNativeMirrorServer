@@ -181,28 +181,27 @@ namespace MirrorServer.Controllers
 
             byte[] signedBytes;
 
-            using (var rsa = new RSACryptoServiceProvider())
+            using var rsa = new RSACryptoServiceProvider();
+            // Write the message to a byte array using ASCII as the encoding.
+            try
             {
-                // Write the message to a byte array using ASCII as the encoding.
-                try
-                {
-                    // Import the private key used for signing the message
-                    rsa.ImportParameters(privateKey);
+                // Import the private key used for signing the message
+                rsa.ImportParameters(privateKey);
 
-                    // Sign the data, using SHA512 as the hashing algorithm 
-                    signedBytes = rsa.SignData(data, CryptoConfig.MapNameToOID("SHA512"));
-                }
-                catch (CryptographicException e)
-                {
-                    Console.WriteLine(e.Message);
-                    return null;
-                }
-                finally
-                {
-                    // Set the keycontainer to be cleared when rsa is garbage collected.
-                    rsa.PersistKeyInCsp = false;
-                }
+                // Sign the data, using SHA512 as the hashing algorithm 
+                signedBytes = rsa.SignData(data, CryptoConfig.MapNameToOID("SHA512"));
             }
+            catch (CryptographicException e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+            finally
+            {
+                // Set the keycontainer to be cleared when rsa is garbage collected.
+                rsa.PersistKeyInCsp = false;
+            }
+
             // Convert the byte array back to a string message
             return signedBytes;
         }

@@ -13,6 +13,8 @@ namespace McNativeMirrorServer.Model
 
         public string Name { get; set; }
 
+        public string Website { get; set; }
+
         [InverseProperty("Organisation")]
         public virtual ICollection<License> Licenses { get; set; }
     }

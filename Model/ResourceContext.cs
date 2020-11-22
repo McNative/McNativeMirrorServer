@@ -21,6 +21,8 @@ namespace McNativeMirrorServer.Model
 
         public DbSet<AliveReport> AliveReports { get; set; }
 
+        public DbSet<SystemLoaders> SystemLoaders { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("mcnative");
@@ -33,6 +35,8 @@ namespace McNativeMirrorServer.Model
             modelBuilder.Entity<Organisation>().ToTable("mcnative_organisation");
             modelBuilder.Entity<RolloutServer>().ToTable("mcnative_organisation_rollout_servers");
             modelBuilder.Entity<AliveReport>().ToTable("mcnative_resource_reporting");
+
+            modelBuilder.Entity<SystemLoaders>().ToTable("system_loader-build-service_loaders");
         }
 
     }

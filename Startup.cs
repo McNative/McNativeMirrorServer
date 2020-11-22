@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using McNativeMirrorServer.Services;
 
 namespace McNativeMirrorServer
 {
@@ -28,6 +29,7 @@ namespace McNativeMirrorServer
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
+            services.AddHostedService<ResourceLoaderBuildService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

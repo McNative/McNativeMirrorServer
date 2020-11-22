@@ -31,46 +31,28 @@ namespace MirrorServer.Controllers
         [HttpGet("{name}/{edition}")]
         public async Task<ActionResult> download(string name, string edition)
         {
-            Resource result = _context.Resources.FirstOrDefault(resource => resource.Name.ToLower().Equals(name.ToLower()));//@Todo check for public
-            if (result == null)
+
+            Resource result = _context.Resources.FirstOrDefault(resource => resource.Name.ToLower().Equals(name.ToLower()));
+            if (result == null || !result.Public)
+            {
+                 return NotFound();
+            }
+
+            string path = Path.Combine(_rootPath, "loaders", result.Id + ".jar");
+
+            if (!System.IO.File.Exists(path))
             {
                 return NotFound();
             }
-
-            if(edition == null)
-            {
-                if (result.DefaultDownloadEdition == null)
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    edition = result.DefaultDownloadEdition;
-                }
-            }
-
-            ResourceVersion version = result.Versions.Where(version => version.Qualifier == "RELEASE").OrderByDescending(version => version.BuildNumber).FirstOrDefault();
-            if (version == null)
-            {
-                return NotFound();
-            }
-
-            ResourceEdition edition0 = result.Editions.Where(edition0 => edition0.Name.ToLower().Equals(edition)).FirstOrDefault();
-            if (edition0 == null || !edition0.IsAvailableAsDownload)
-            {
-                return NotFound();
-            }
-
-            string path = Path.Combine(_rootPath, result.Id, "resource-" + version.Id + "-" + edition0.Id + ".jar");
 
             var memory = new MemoryStream();
-            using (var stream = new FileStream(path, FileMode.Open))
+            await using (var stream = new FileStream(path, FileMode.Open))
             {
                 await stream.CopyToAsync(memory);
                 stream.Close();
             }
             memory.Position = 0;
-            return File(memory, MediaTypeNames.Application.Zip, result.Name + " v" + version.Name + ".jar");
+            return File(memory, MediaTypeNames.Application.Zip, result.Name.ToLower().Replace(" ", "_") + "-loader.jar");
         }
     }
 }

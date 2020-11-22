@@ -124,7 +124,7 @@ namespace MirrorServer.Controllers
             ,[FromHeader] string serverId, [FromHeader] string serverSecret
             ,[FromHeader] string rolloutId, [FromHeader] string rolloutSecret)
         {
-            Resource resource = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
+            Resource resource = await _context.Resources.FirstOrDefaultAsync(resource => resource.Id.Equals(resourceId));
             if (resource == null)
             {
                 return NotFound();
@@ -136,14 +136,14 @@ namespace MirrorServer.Controllers
                 if(rolloutId != null)
                 {
                     if(rolloutSecret == null) return Unauthorized("Rollout id or secret is missing");
-                    RolloutServer server = _context.RolloutServers.SingleOrDefault(server => server.Id == rolloutId);
+                    RolloutServer server = await _context.RolloutServers.SingleOrDefaultAsync(server => server.Id == rolloutId);
                     if (server == null || !server.Secret.Equals(rolloutSecret)) return Unauthorized("Invalid server id or secret");
                     organisation = server.Organisation;
                 }
                 else if(serverId != null)
                 {
                     if(serverSecret == null) return Unauthorized("Server id or secret is missing");
-                    Server server = _context.Servers.SingleOrDefault(server => server.Id == serverId);
+                    Server server = await _context.Servers.SingleOrDefaultAsync(server => server.Id == serverId);
                     if (server == null || !server.Secret.Equals(serverSecret)) return Unauthorized("Invalid server id or secret");
                     organisation = server.Organisation;
                 }
@@ -161,7 +161,7 @@ namespace MirrorServer.Controllers
                 }
             } 
 
-            ResourceVersion version = resource.Versions.Where(version => version.BuildNumber == buildId).FirstOrDefault();
+            ResourceVersion version = resource.Versions.FirstOrDefault(version => version.BuildNumber == buildId);
             if (version == null)
             {
                 return NotFound();
@@ -169,7 +169,7 @@ namespace MirrorServer.Controllers
 
             if (edition == null) edition = "default";
 
-            ResourceEdition edition0 = resource.Editions.Where(edition0 => string.Equals(edition0.Name, edition, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            ResourceEdition edition0 = resource.Editions.FirstOrDefault(edition0 => string.Equals(edition0.Name, edition, StringComparison.OrdinalIgnoreCase));
             if (edition0 == null)
             {
                 return NotFound();
@@ -183,7 +183,7 @@ namespace MirrorServer.Controllers
             }
 
             var memory = new MemoryStream();
-            using (var stream = new FileStream(path, FileMode.Open))
+            await using (var stream = new FileStream(path, FileMode.Open))
             {
                 await stream.CopyToAsync(memory);
                 stream.Close();
@@ -228,13 +228,13 @@ namespace MirrorServer.Controllers
                 return NotFound();
             }
 
-            ResourceVersion version = result.Versions.Where(version => version.BuildNumber == buildId).FirstOrDefault();
+            ResourceVersion version = result.Versions.FirstOrDefault(version => version.BuildNumber == buildId);
             if (version == null)
             {
                 return NotFound();
             }
 
-            ResourceEdition edition0 = result.Editions.Where(edition0 => string.Equals(edition0.Name, edition, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            ResourceEdition edition0 = result.Editions.FirstOrDefault(e => string.Equals(e.Name, edition, StringComparison.OrdinalIgnoreCase));
             if (edition0 == null)
             {
                 return NotFound();
@@ -269,13 +269,15 @@ namespace MirrorServer.Controllers
 
             ResourceVersion version = result.Versions.FirstOrDefault(version => version.Name == name);
             if (version == null)
-            { 
-                version = new ResourceVersion();
-                version.Name = name;
-                version.Qualifier = qualifier.ToUpper();
-                version.BuildNumber = buildNumber == -1 ? GetNextBuildNumber(resourceId) : buildNumber;
-                version.ResourceId = result.Id;
-                version.Time = DateTime.Now;
+            {
+                version = new ResourceVersion
+                {
+                    Name = name,
+                    Qualifier = qualifier.ToUpper(),
+                    BuildNumber = buildNumber == -1 ? GetNextBuildNumber(resourceId) : buildNumber,
+                    ResourceId = result.Id,
+                    Time = DateTime.Now
+                };
 
                 await _context.AddAsync(version);
                 await _context.SaveChangesAsync();
