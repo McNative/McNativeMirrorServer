@@ -33,13 +33,18 @@ namespace McNativeMirrorServer.Model
             SubscriptionActive subscription =
                 await context.SubscriptionActives.Where(s => s.OrganisationId == Id && containing.Contains(s.SubscriptionId) && !s.Disabled && (s.Expiry == null || s.Expiry > DateTime.Now)).FirstOrDefaultAsync();
 
+            if (subscription == null)
+            {
+                return null;
+            }
+
             license = new License()
             {
                 OrganisationId = Id,
                 ResourceId = resourceId,
                 Expiry = subscription.Expiry,
                 Disabled = false,
-                ManagedBySubscriptionId = subscription.Id
+                ManagedBySubscriptionId = subscription.SubscriptionId
             };
             await context.AddAsync(license);
             await context.SaveChangesAsync();

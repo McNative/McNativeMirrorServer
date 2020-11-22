@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace McNativeMirrorServer.Model
 {
     public class SubscriptionActive
     {
+        [Key]
         public string Id { get; set; }
 
         public string OrganisationId { get; set; }
