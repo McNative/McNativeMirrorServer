@@ -58,7 +58,7 @@ namespace McNativeMirrorServer.Services
                 context.Add(loader);
                 context.SaveChanges();
                 Organisation owner = resource.Owner;
-                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description);
+                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description, version);
                 Thread.Sleep(2000);
             }
 
@@ -71,9 +71,10 @@ namespace McNativeMirrorServer.Services
                 context.SaveChanges();
                 Resource resource = loader.Resource;
                 Organisation owner = resource.Owner;
-                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description);
+                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description,version);
                 Thread.Sleep(2000);
             }
+
         }
 
         public Task StopAsync(CancellationToken stoppingToken)
@@ -88,9 +89,9 @@ namespace McNativeMirrorServer.Services
             _timer?.Dispose();
         }
 
-        private void TriggerBuild(string name,string resourceId,string author, string website, string description)
+        private void TriggerBuild(string name,string resourceId,string author, string website, string description,string version)
         {
-            string url = "https://ci.pretronic.net/job/McNativeLoaderGenerationTemplate/buildWithParameters?token=wYiyVzmjBT1J4GsuiBtBjtSOKbfcYvg7h&name="+name+" &author="+author+" &resourceId="+resourceId+" &website="+website+" &description="+description;
+            string url = "https://ci.pretronic.net/job/McNativeLoaderGenerationTemplate/buildWithParameters?token=wYiyVzmjBT1J4GsuiBtBjtSOKbfcYvg7h&name="+name+" &author="+author+" &resourceId="+resourceId+" &website="+website + " &version=" + version + " &description="+description;
             HttpWebRequest request = WebRequest.CreateHttp(url);
             request.Method = "GET";
 
