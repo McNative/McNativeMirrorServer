@@ -38,6 +38,9 @@ namespace McNativeMirrorServer.Model
             modelBuilder.Entity<ResourceEdition>().ToTable("mcnative_resource_editions");
             modelBuilder.Entity<License>().ToTable("mcnative_license");
             modelBuilder.Entity<LicenseActive>().ToTable("mcnative_license_active");
+            modelBuilder.Entity<Subscription>().ToTable("mcnative_subscription");
+            modelBuilder.Entity<SubscriptionActive>().ToTable("mcnative_subscription_active");
+            modelBuilder.Entity<SubscriptionResource>().ToTable("mcnative_subscription_resources");
             modelBuilder.Entity<Organisation>().ToTable("mcnative_organisation");
             modelBuilder.Entity<RolloutServer>().ToTable("mcnative_organisation_rollout_servers");
             modelBuilder.Entity<AliveReport>().ToTable("mcnative_resource_reporting");
