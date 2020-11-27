@@ -15,10 +15,11 @@ namespace McNativeMirrorServer.Model
         public string Description { get; set; }
 
         public string PrivateKey { get; set; }
-        public string DefaultDownloadEdition { get; set; }
 
         public bool Public { get; set; }
         public bool Licensed { get; set; }
+
+        public bool BuildLoader { get; set; }
 
         public bool AliveReportingEnabled { get; set; }
 

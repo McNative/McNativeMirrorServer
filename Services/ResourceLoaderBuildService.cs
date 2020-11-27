@@ -43,7 +43,7 @@ namespace McNativeMirrorServer.Services
             string version = GetLatestLoaderVersion();
 
             IQueryable<string> loaders = context.SystemLoaders.Select(l => l.ResourceId);
-            List<Resource> resources = context.Resources.Where(r => r.Public && !loaders.Contains(r.Id)).Take(1000).ToList();//@Todo Temp solution, change to partial loading
+            List<Resource> resources = context.Resources.Where(r => (r.Public || r.BuildLoader) && !loaders.Contains(r.Id)).Take(1000).ToList();//@Todo Temp solution, change to partial loading
 
             foreach (Resource resource in resources)
             {

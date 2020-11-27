@@ -54,5 +54,33 @@ namespace MirrorServer.Controllers
             memory.Position = 0;
             return File(memory, MediaTypeNames.Application.Zip, result.Name.ToLower().Replace(" ", "_") + ".jar");
         }
+
+        [HttpGet("id/{id}")]
+        public async Task<ActionResult> downloadById(string id)
+        {
+
+            Resource result = _context.Resources.FirstOrDefault(resource => resource.Id == id);
+
+            if (result == null || !result.BuildLoader)
+            {
+                return NotFound();
+            }
+
+            string path = Path.Combine(_rootPath, "loaders", result.Id + ".jar");
+
+            if (!System.IO.File.Exists(path))
+            {
+                return NotFound();
+            }
+
+            var memory = new MemoryStream();
+            await using (var stream = new FileStream(path, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+                stream.Close();
+            }
+            memory.Position = 0;
+            return File(memory, MediaTypeNames.Application.Zip, result.Name.ToLower().Replace(" ", "_") + ".jar");
+        }
     }
 }

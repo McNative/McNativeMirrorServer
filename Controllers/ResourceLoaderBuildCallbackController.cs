@@ -43,7 +43,8 @@ namespace MirrorServer.Controllers
             }
 
             string path = Path.Combine(_rootPath, "loaders", resourceId + ".jar");
-            FileStream stream = System.IO.File.OpenWrite(path);
+            System.IO.File.Delete(path);
+             FileStream stream = System.IO.File.OpenWrite(path);
             await upload.CopyToAsync(stream);
             stream.Close();
 
