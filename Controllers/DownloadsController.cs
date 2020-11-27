@@ -61,7 +61,7 @@ namespace MirrorServer.Controllers
 
             Resource result = _context.Resources.FirstOrDefault(resource => resource.Id == id);
 
-            if (result == null || !result.BuildLoader)
+            if (result == null || !(result.BuildLoader || result.BuildLoader))
             {
                 return NotFound();
             }
