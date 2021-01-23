@@ -58,7 +58,7 @@ namespace McNativeMirrorServer.Services
                 context.Add(loader);
                 context.SaveChanges();
                 Organisation owner = resource.Owner;
-                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description, version, resource.LoaderInstallMcNative);
+                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description, version, resource.LoaderInstallMcNative.ToString().ToLower());
                 Thread.Sleep(2000);
             }
 
@@ -71,7 +71,7 @@ namespace McNativeMirrorServer.Services
                 context.SaveChanges();
                 Resource resource = loader.Resource;
                 Organisation owner = resource.Owner;
-                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description,version,resource.LoaderInstallMcNative);
+                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description,version,resource.LoaderInstallMcNative.ToString().ToLower());
                 Thread.Sleep(2000);
             }
 
@@ -89,9 +89,9 @@ namespace McNativeMirrorServer.Services
             _timer?.Dispose();
         }
 
-        private void TriggerBuild(string name,string resourceId,string author, string website, string description,string version,bool installMcNative)
+        private void TriggerBuild(string name,string resourceId,string author, string website, string description,string version,string installMcNative)
         {
-            string url = "https://ci.pretronic.net/job/McNativeLoaderGenerationTemplate/buildWithParameters?token=wYiyVzmjBT1J4GsuiBtBjtSOKbfcYvg7h&name="+name+" &author="+author+" &resourceId="+resourceId+" &website="+website + " &version=" + version + " &installMcNative=" + installMcNative + " &description="+description;
+            string url = "https://ci.pretronic.net/job/McNativeLoaderGenerationTemplate/buildWithParameters?token=wYiyVzmjBT1J4GsuiBtBjtSOKbfcYvg7h&name="+name+"&author="+author+"&resourceId="+resourceId+"&website="+website + "&version=" + version + "&installMcNative=" + installMcNative + "&description="+description;
             HttpWebRequest request = WebRequest.CreateHttp(url);
             request.Method = "GET";
 
