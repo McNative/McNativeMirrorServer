@@ -58,7 +58,7 @@ namespace McNativeMirrorServer.Services
                 context.Add(loader);
                 context.SaveChanges();
                 Organisation owner = resource.Owner;
-                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description, version);
+                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description, version, resource.LoaderInstallMcNative);
                 Thread.Sleep(2000);
             }
 
@@ -71,7 +71,7 @@ namespace McNativeMirrorServer.Services
                 context.SaveChanges();
                 Resource resource = loader.Resource;
                 Organisation owner = resource.Owner;
-                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description,version);
+                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description,version,resource.LoaderInstallMcNative);
                 Thread.Sleep(2000);
             }
 
@@ -89,9 +89,9 @@ namespace McNativeMirrorServer.Services
             _timer?.Dispose();
         }
 
-        private void TriggerBuild(string name,string resourceId,string author, string website, string description,string version)
+        private void TriggerBuild(string name,string resourceId,string author, string website, string description,string version,bool installMcNative)
         {
-            string url = "https://ci.pretronic.net/job/McNativeLoaderGenerationTemplate/buildWithParameters?token=wYiyVzmjBT1J4GsuiBtBjtSOKbfcYvg7h&name="+name+" &author="+author+" &resourceId="+resourceId+" &website="+website + " &version=" + version + " &description="+description;
+            string url = "https://ci.pretronic.net/job/McNativeLoaderGenerationTemplate/buildWithParameters?token=wYiyVzmjBT1J4GsuiBtBjtSOKbfcYvg7h&name="+name+" &author="+author+" &resourceId="+resourceId+" &website="+website + " &version=" + version + " &installMcNative=" + installMcNative + " &description="+description;
             HttpWebRequest request = WebRequest.CreateHttp(url);
             request.Method = "GET";
 
@@ -102,7 +102,7 @@ namespace McNativeMirrorServer.Services
         }
         private string GetLatestLoaderVersion()
         {
-            HttpWebRequest request = WebRequest.CreateHttp("https://repository.pretronic.net/repository/pretronic/org/mcnative/McNative/maven-metadata.xml");
+            HttpWebRequest request = WebRequest.CreateHttp("https://repository.pretronic.net/repository/pretronic/org/mcnative/loader/McNativeResourceLoader/maven-metadata.xml");
             request.Method = "GET";
             WebResponse response = request.GetResponse();
             StreamReader reader = new StreamReader(response.GetResponseStream());

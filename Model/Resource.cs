@@ -24,6 +24,9 @@ namespace McNativeMirrorServer.Model
         public bool BuildLoader { get; set; }
 
         [JsonIgnore]
+        public bool LoaderInstallMcNative { get; set; }
+
+        [JsonIgnore]
         public bool AliveReportingEnabled { get; set; }
 
         [JsonIgnore]
