@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace McNativeMirrorServer.Model
 {
-    public class LicenseActive
+    public class LicenseIssued
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

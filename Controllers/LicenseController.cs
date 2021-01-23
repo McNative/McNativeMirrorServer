@@ -26,11 +26,9 @@ namespace MirrorServer.Controllers
         
         [HttpGet("{resourceId}/checkout")]
         public async Task<IActionResult> Checkout(string resourceId, [FromHeader] string deviceId,
-            [FromHeader] string serverId, [FromHeader] string serverSecret
-            ,[FromHeader] string rolloutId, [FromHeader] string rolloutSecret)//ResourceId DeviceId // ServerId/Secret OR RolloutId/Secret
-        {
-            RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
-            string str = RSA.ToXmlString(true);
+            [FromHeader] string networkId, [FromHeader] string networkSecret
+            ,[FromHeader] string rolloutServerId, [FromHeader] string rolloutServerSecret
+            ,[FromHeader] string licenseKey) {
             Resource resource = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
             if (resource == null)
             {
@@ -38,44 +36,31 @@ namespace MirrorServer.Controllers
             }
             if(resource.Licensed)
             {
-                Organisation organisation;
-                if(rolloutId != null)
+                License license;
+                if (licenseKey != null)
                 {
-                    if(rolloutSecret == null) return Unauthorized("Rollout id or secret is missing");
-                    RolloutServer server = _context.RolloutServers.SingleOrDefault(server => server.Id == rolloutId);
-                    if (server == null || !server.Secret.Equals(rolloutSecret)) return Unauthorized("Invalid server id or secret");
-                    organisation = server.Organisation;
-                }
-                else if(serverId != null)
-                {
-                    if(serverSecret == null) return Unauthorized("Server id or secret is missing");
-                    Server server = _context.Servers.SingleOrDefault(server => server.Id == serverId);
-                    if (server == null || !server.Secret.Equals(serverSecret)) return Unauthorized("Invalid server id or secret");
-                    organisation = server.Organisation;
+                    license = await _context.Licenses.FirstOrDefaultAsync(l => l.Key == licenseKey);
+                    if (license == null) return Unauthorized("Invalid license key");
                 }
                 else
                 {
-                    return Unauthorized("Missing authentication credentials");
-                }
-
-                License license = await organisation.FindLicense(_context, resourceId);
-
-                if(license == null)
-                {
-                    return Unauthorized("Resource not licensed to server");
+                    Organisation organisation = await Organisation.FindByCredentials(_context, networkId, networkSecret, rolloutServerId, rolloutServerSecret);
+                    if (organisation == null) return Unauthorized("Missing or wrong authentication credentials");
+                    
+                    license = await organisation.FindLicense(_context, resourceId);
+                    if (license == null) return Unauthorized("Resource not licensed to organization");
                 }
 
                 var now = DateTime.Now;
-
                 var expiry = now.AddDays(7);
                 if (license.Expiry != null && expiry > license.Expiry) expiry = license.Expiry.Value;
 
                 var preferredRefreshTime = now.AddDays(3);
 
-                LicenseActive activeLicense = await _context.LicenceActives.Where(a => a.DeviceId == deviceId).FirstOrDefaultAsync();
-                if (activeLicense == null)
+                LicenseIssued issuedLicense = await _context.LicenceIssued.Where(a => a.LicenseId == license.Id &&  a.DeviceId == deviceId).FirstOrDefaultAsync();
+                if (issuedLicense == null)
                 {
-                    activeLicense = new LicenseActive
+                    issuedLicense = new LicenseIssued
                     {
                         LicenseId = license.Id,
                         DeviceId = deviceId,
@@ -83,24 +68,24 @@ namespace MirrorServer.Controllers
                         Expiry = expiry,
                         CheckoutTime = now
                     };
-                    await _context.AddAsync(activeLicense);
+                    await _context.AddAsync(issuedLicense);
                 }
                 else
                 {
-                    activeLicense.RequestAddress = HttpContext.Connection.RemoteIpAddress.ToString();
-                    activeLicense.CheckoutTime = now;
-                    activeLicense.Expiry = expiry;
-                    _context.Update(activeLicense);
+                    issuedLicense.RequestAddress = HttpContext.Connection.RemoteIpAddress.ToString();
+                    issuedLicense.CheckoutTime = now;
+                    issuedLicense.Expiry = expiry;
+                    _context.Update(issuedLicense);
                 }
 
                 await _context.SaveChangesAsync();
                 
                 var properties = new Properties();
-                properties.set("Id",activeLicense.Id);
+                properties.set("Id", issuedLicense.Id);
                 properties.set("Issuer", "licensing.mcnative.org");
                 properties.set("CheckoutTime", now.Ticks);
-                properties.set("OrganisationId", organisation.Id);
-                properties.set("OrganisationName", organisation.Name);
+                properties.set("OrganisationId", license.OrganisationId);
+                properties.set("OrganisationName", license.Organisation.Name);
                 properties.set("DeviceId", deviceId);
                 properties.set("ResourceId", resourceId);
                 properties.set("Expiry", expiry.Ticks);

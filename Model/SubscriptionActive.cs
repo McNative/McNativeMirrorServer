@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace McNativeMirrorServer.Model
 {
@@ -15,5 +16,8 @@ namespace McNativeMirrorServer.Model
         public DateTime? Expiry { get; set; }
 
         public bool Disabled { get; set; }
+
+        [ForeignKey("SubscriptionId")]
+        public virtual Subscription Subscription { get; set; }
     }
 }

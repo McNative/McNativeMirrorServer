@@ -16,14 +16,12 @@ namespace MirrorServer.Controllers
     [ApiController]
     public class ResourceController : ControllerBase
     {
-        private readonly IConfiguration _config;
         private readonly ResourceContext _context;
         private readonly string _rootPath;
         private readonly string _token;
 
-        public ResourceController(IConfiguration config, ResourceContext context)
+        public ResourceController(ResourceContext context)
         {
-            _config = config;
             _context = context;
             _rootPath = Environment.GetEnvironmentVariable("PRETRONIC_PATH");
             _token = Environment.GetEnvironmentVariable("PRETRONIC_TOKEN");
@@ -34,11 +32,7 @@ namespace MirrorServer.Controllers
         public ActionResult Get(string resourceId)
         {
             Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
-
-            if (result == null)
-            {
-                return NotFound();
-            }
+            if (result == null) return NotFound();
 
             return Ok(result);
         }
@@ -49,11 +43,7 @@ namespace MirrorServer.Controllers
         {
             if (limit == 0) limit = 150;
             Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
-
-            if (result == null)
-            {
-                return NotFound();
-            }
+            if (result == null)  return NotFound();
 
             IEnumerable<ResourceVersion> versions = result.Versions.OrderByDescending(t => t.BuildNumber);
             if(qualifier != null) versions = versions.Where(v => v.Qualifier == qualifier);
@@ -62,125 +52,61 @@ namespace MirrorServer.Controllers
             return Ok(versions);
         }
 
-        [HttpGet("{resourceId}/editions/")]
-        public ActionResult GetEditions(string resourceId)
-        {
-            Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
-
-            if (result == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result.Editions);
-        }
-
         [HttpGet("{resourceId}/versions/latest")]
         public ActionResult GetLatestVersion(string resourceId, bool plain, string qualifier, bool stable, bool beta)
         {
             Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
-
-            if (result == null)
-            {
-                return NotFound();
-            }
+            if (result == null)  return NotFound();
 
             ResourceVersion latest;
 
-            if (stable)
-            {
-                qualifier = "RELEASE";
-            }
+            if (stable)qualifier = "RELEASE"; 
+            else if (beta) qualifier = "BETA";
 
-            if (beta)
-            {
-                qualifier = "BETA";
-            }
+            if (qualifier == null) latest = result.Versions.OrderByDescending(version => version.BuildNumber).FirstOrDefault();
+            else latest = result.Versions.Where(version => version.Qualifier.Equals(qualifier, StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(version => version.BuildNumber).FirstOrDefault();
 
-            if (qualifier == null)
-            {
-                latest = result.Versions.OrderByDescending(version => version.BuildNumber).FirstOrDefault();
-            }
-            else
-            {
-                latest = result.Versions.Where(version => version.Qualifier.Equals(qualifier, StringComparison.OrdinalIgnoreCase)).OrderByDescending(version => version.BuildNumber).FirstOrDefault();
-            }
+            if (latest == null) return NotFound();
 
-            if (latest == null)
-            {
-                return NotFound();
-            }
-
-            if (plain)
-            {
-                return Content(latest.Name + ";" + latest.BuildNumber + ";" + latest.Qualifier + ";" + latest.Time);
-            }
-
-            return Ok(latest);
+            if (plain) return Content(latest.Name + ";" + latest.BuildNumber + ";" + latest.Qualifier + ";" + latest.Time);
+            else return Ok(latest);
         }
 
         [HttpGet("{resourceId}/versions/{buildId}/download")]
         public async Task<ActionResult> DownloadVersion(string resourceId,int buildId,string edition
-            ,[FromHeader] string serverId, [FromHeader] string serverSecret
-            ,[FromHeader] string rolloutId, [FromHeader] string rolloutSecret)
-        {
+            ,[FromHeader] string networkId, [FromHeader] string networkSecret
+            , [FromHeader] string rolloutServerId, [FromHeader] string rolloutServerSecret,string licenseKey) {
             Resource resource = await _context.Resources.FirstOrDefaultAsync(resource => resource.Id.Equals(resourceId));
-            if (resource == null)
-            {
-                return NotFound();
-            }
+            if (resource == null )return NotFound();
 
             if(resource.Licensed)
             {
-                Organisation organisation;
-                if(rolloutId != null)
+                License license;
+                if (licenseKey != null)
                 {
-                    if(rolloutSecret == null) return Unauthorized("Rollout id or secret is missing");
-                    RolloutServer server = await _context.RolloutServers.SingleOrDefaultAsync(server => server.Id == rolloutId);
-                    if (server == null || !server.Secret.Equals(rolloutSecret)) return Unauthorized("Invalid server id or secret");
-                    organisation = server.Organisation;
-                }
-                else if(serverId != null)
-                {
-                    if(serverSecret == null) return Unauthorized("Server id or secret is missing");
-                    Server server = await _context.Servers.SingleOrDefaultAsync(server => server.Id == serverId);
-                    if (server == null || !server.Secret.Equals(serverSecret)) return Unauthorized("Invalid server id or secret");
-                    organisation = server.Organisation;
+                    license = await _context.Licenses.FirstOrDefaultAsync(l => l.Key == licenseKey);
+                    if (license == null) return Unauthorized("Invalid license key");
                 }
                 else
                 {
-                    return Unauthorized("Missing authentication credentials");
-                }
-
-
-                License license = await organisation.FindLicense(_context, resourceId);
-
-                if (license == null)
-                {
-                    return Unauthorized("Resource not licensed to server");
+                    Organisation organisation = await Organisation.FindByCredentials(_context, networkId, networkSecret, rolloutServerId, rolloutServerSecret);
+                    if (organisation == null) return Unauthorized("Missing or wrong authentication credentials"); 
+                    license = await organisation.FindLicense(_context, resourceId);
+                    if (license == null) return Unauthorized("Resource not licensed to organisation");
                 }
             } 
 
             ResourceVersion version = resource.Versions.FirstOrDefault(version => version.BuildNumber == buildId);
-            if (version == null)
-            {
-                return NotFound();
-            }
+            if (version == null) return NotFound();
 
             if (edition == null) edition = "default";
 
             ResourceEdition edition0 = resource.Editions.FirstOrDefault(edition0 => string.Equals(edition0.Name, edition, StringComparison.OrdinalIgnoreCase));
-            if (edition0 == null)
-            {
-                return NotFound();
-            }
+            if (edition0 == null) return NotFound();
 
             string path = Path.Combine(_rootPath, resource.Id, "resource-" + version.Id + "-" + edition0.Id + ".jar");
-
-            if (!System.IO.File.Exists(path))
-            {
-                return NotFound();
-            }
+            if (!System.IO.File.Exists(path)) return NotFound();
 
             var memory = new MemoryStream();
             await using (var stream = new FileStream(path, FileMode.Open))
@@ -199,10 +125,7 @@ namespace MirrorServer.Controllers
             if (!_token.Equals(token))return Unauthorized();
 
             Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
-            if (result == null)
-            {
-                return NotFound();
-            }
+            if (result == null) return NotFound();
             ResourceVersion version = new ResourceVersion();
             version.Name = name;
             version.Qualifier = qualifier;
@@ -223,22 +146,13 @@ namespace MirrorServer.Controllers
             if (!_token.Equals(token)) return Unauthorized();
 
             Resource result = await _context.Resources.FirstOrDefaultAsync(resource => resource.Id.Equals(resourceId));//@Todo check for public
-            if (result == null)
-            {
-                return NotFound();
-            }
+            if (result == null) return NotFound();
 
             ResourceVersion version = result.Versions.FirstOrDefault(version => version.BuildNumber == buildId);
-            if (version == null)
-            {
-                return NotFound();
-            }
+            if (version == null) return NotFound();
 
             ResourceEdition edition0 = result.Editions.FirstOrDefault(e => string.Equals(e.Name, edition, StringComparison.OrdinalIgnoreCase));
-            if (edition0 == null)
-            {
-                return NotFound();
-            }
+            if (edition0 == null) return NotFound();
 
             string path = Path.Combine(_rootPath, result.Id, "resource-" + version.Id + "-" + edition0.Id + ".jar");
 
@@ -257,15 +171,8 @@ namespace MirrorServer.Controllers
         public async Task<ActionResult> DeployResource(string resourceId, string name, string qualifier, string edition, int buildNumber, [FromForm(Name = "File")] IFormFile upload, [FromHeader] string secret)
         {
             Resource result = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
-            if (result == null)
-            {
-                return NotFound("Resource not found");
-            }
-
-            if (!result.DeploySecret.Equals(secret))
-            {
-                return Unauthorized("Invalid resource secret");
-            }
+            if (result == null) return NotFound("Resource not found");
+            if (!result.DeploySecret.Equals(secret)) return Unauthorized("Invalid resource secret");
 
             ResourceVersion version = result.Versions.FirstOrDefault(version => version.Name == name);
             if (version == null)
@@ -288,10 +195,7 @@ namespace MirrorServer.Controllers
             }
 
             ResourceEdition edition0 = result.Editions.FirstOrDefault(edition0 => edition0.Name == edition);
-            if (edition0 == null)
-            {
-                return NotFound("Edition "+edition+" does not exist (Please create a new edition in the McNative console)");
-            }
+            if (edition0 == null) return NotFound("Edition "+edition+" does not exist (Please create a new edition in the McNative console)");
 
             string path = Path.Combine(_rootPath, result.Id, "resource-" + version.Id + "-" + edition0.Id + ".jar");
 
@@ -310,11 +214,7 @@ namespace MirrorServer.Controllers
         {
             ResourceVersion version = _context.ResourceVersions.OrderByDescending(v => v.BuildNumber)
                 .FirstOrDefault(v => v.ResourceId == resourceId);
-
-            if (version == null)
-            {
-                return 1;
-            }
+            if (version == null) return 1;
 
             return version.BuildNumber+1;
         }

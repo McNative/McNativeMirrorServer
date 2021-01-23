@@ -11,6 +11,8 @@ namespace McNativeMirrorServer.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
 
+        public string Key { get; set; }
+
         public string OrganisationId { get; set; }
 
         public string ResourceId { get; set; }
