@@ -17,7 +17,7 @@ namespace McNativeMirrorServer.Model
         public string Website { get; set; }
 
         [InverseProperty("Organisation")]
-        public virtual ICollection<License> Licenses { get; set; }
+        public virtual ICollection<LicenseActive> Licenses { get; set; }
 
 
         public static async Task<Organisation> FindByRolloutCredentials(ResourceContext context, string rolloutServerId, string rolloutServerSecret)
@@ -41,31 +41,12 @@ namespace McNativeMirrorServer.Model
             return null;
         }
 
-        public async Task<License> FindLicense(ResourceContext context, string resourceId)
+        public async Task<LicenseActive> FindLicense(ResourceContext context, string resourceId)
         {
-            License license = Licenses.FirstOrDefault(l => l.ResourceId == resourceId && !l.Disabled && (l.Expiry == null || l.Expiry > DateTime.Now));
-            if (license != null) return license;
-
-            IQueryable<string> containing = context.SubscriptionResources.Where(c => c.ResourceId == resourceId).Select(c => c.SubscriptionId);
-
-            SubscriptionActive subscription = await context.SubscriptionActives
-                .Where(s => s.OrganisationId == Id && containing.Contains(s.SubscriptionId) && !s.Disabled && (s.Expiry == null || s.Expiry > DateTime.Now))
-                .FirstOrDefaultAsync();
-
-            if (subscription == null) return null;
-
-            license = new License()
-            {
-                OrganisationId = Id,
-                ResourceId = resourceId,
-                Expiry = subscription.Expiry,
-                Disabled = false,
-                ManagedBySubscriptionId = subscription.SubscriptionId,
-                MaxInstances = 10
-            };
-            await context.AddAsync(license);
-            await context.SaveChangesAsync();
-            return license;
+            return (from active in context.ActiveLicense
+                join resource in context.LicenseResources on active.LicenseId equals resource.LicenseId
+                where active.OrganisationId == Id && resource.Id == resourceId && !active.Disabled && (active.Expiry == null || active.Expiry > DateTime.Now)
+                select active).FirstOrDefault();
         }
     }
 }

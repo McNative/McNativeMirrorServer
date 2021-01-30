@@ -7,17 +7,18 @@ namespace McNativeMirrorServer.Model
         public ResourceContext(DbContextOptions<ResourceContext> options) : base(options){}
 
         public DbSet<Resource> Resources { get; set; }
+
         public DbSet<ResourceVersion> ResourceVersions { get; set; }
 
-        public DbSet<License> Licenses { get; set; }
+        public DbSet<LicenseActive> ActiveLicense { get; set; }
 
         public DbSet<LicenseIssued> LicenceIssued { get; set; }
 
-        public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<LicenseResource> LicenseResources { get; set; }
 
-        public DbSet<SubscriptionActive> SubscriptionActives { get; set; }
+        public DbSet<License> Licenses { get; set; }
 
-        public DbSet<SubscriptionResource> SubscriptionResources { get; set; }
+        public DbSet<LicenseResource> SubscriptionResources { get; set; }
 
         public DbSet<Server> Servers { get; set; }
 
@@ -41,10 +42,9 @@ namespace McNativeMirrorServer.Model
             modelBuilder.Entity<ResourceVersion>().ToTable("mcnative_resource_versions");
             modelBuilder.Entity<ResourceEdition>().ToTable("mcnative_resource_editions");
             modelBuilder.Entity<License>().ToTable("mcnative_license");
+            modelBuilder.Entity<LicenseActive>().ToTable("mcnative_license_active");
             modelBuilder.Entity<LicenseIssued>().ToTable("mcnative_license_issued");
-            modelBuilder.Entity<Subscription>().ToTable("mcnative_subscription");
-            modelBuilder.Entity<SubscriptionActive>().ToTable("mcnative_subscription_active");
-            modelBuilder.Entity<SubscriptionResource>().ToTable("mcnative_subscription_resources");
+            modelBuilder.Entity<LicenseResource>().ToTable("mcnative_license_resources");
             modelBuilder.Entity<Organisation>().ToTable("mcnative_organisation");
             modelBuilder.Entity<RolloutServer>().ToTable("mcnative_organisation_rollout_servers");
             modelBuilder.Entity<AliveReport>().ToTable("mcnative_resource_reporting");

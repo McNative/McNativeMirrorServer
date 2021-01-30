@@ -10,11 +10,8 @@ namespace McNativeMirrorServer.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         
-        public string LicenseId { get; set; }
-        
-        [ForeignKey("LicenseId")]
-        public virtual License License { get; set; }
-        
+        public string ActiveLicenseId { get; set; }
+
         public string DeviceId { get; set; }
         
         public string RequestAddress { get; set; }
@@ -22,5 +19,8 @@ namespace McNativeMirrorServer.Model
         public virtual DateTime Expiry { get; set; }
         
         public virtual DateTime CheckoutTime { get; set; }
+
+        [ForeignKey("ActiveLicenseId")]
+        public virtual LicenseActive ActiveLicense { get; set; }
     }
 }

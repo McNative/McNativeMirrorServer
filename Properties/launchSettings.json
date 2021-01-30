@@ -22,6 +22,7 @@
       "launchBrowser": true,
       "launchUrl": "api/values",
       "environmentVariables": {
+        "PRETRONIC_DATABASE": "Server=192.168.1.14;Port=3306;Database=mcnative;User=mcnative-mirror-server;Password=\"JCe0F2KKKB6?6GGebuLm-0(uemK)F+HM*B\";Pooling=true",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"

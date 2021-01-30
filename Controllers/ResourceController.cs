@@ -8,7 +8,6 @@ using McNativeMirrorServer.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace MirrorServer.Controllers
 {
@@ -27,7 +26,6 @@ namespace MirrorServer.Controllers
             _token = Environment.GetEnvironmentVariable("PRETRONIC_TOKEN");
         }
 
-
         [HttpGet("{resourceId}")]
         public ActionResult Get(string resourceId)
         {
@@ -36,7 +34,6 @@ namespace MirrorServer.Controllers
 
             return Ok(result);
         }
-
 
         [HttpGet("{resourceId}/versions/")]
         public ActionResult GetVersions(string resourceId, string qualifier, int limit)
@@ -82,10 +79,10 @@ namespace MirrorServer.Controllers
 
             if(resource.Licensed)
             {
-                License license;
+                LicenseActive license;
                 if (licenseKey != null)
                 {
-                    license = await _context.Licenses.FirstOrDefaultAsync(l => l.Key == licenseKey);
+                    license = await _context.ActiveLicense.FirstOrDefaultAsync(l => l.Key == licenseKey);
                     if (license == null) return Unauthorized("Invalid license key");
                 }
                 else

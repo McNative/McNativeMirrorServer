@@ -36,10 +36,10 @@ namespace MirrorServer.Controllers
             }
             if(resource.Licensed)
             {
-                License license;
+                LicenseActive license;
                 if (licenseKey != null)
                 {
-                    license = await _context.Licenses.FirstOrDefaultAsync(l => l.Key == licenseKey);
+                    license = await _context.ActiveLicense.FirstOrDefaultAsync(l => l.Key == licenseKey);
                     if (license == null) return Unauthorized("Invalid license key");
                 }
                 else
@@ -57,12 +57,12 @@ namespace MirrorServer.Controllers
 
                 var preferredRefreshTime = now.AddDays(3);
 
-                LicenseIssued issuedLicense = await _context.LicenceIssued.Where(a => a.LicenseId == license.Id &&  a.DeviceId == deviceId).FirstOrDefaultAsync();
+                LicenseIssued issuedLicense = await _context.LicenceIssued.Where(a => a.ActiveLicenseId == license.Id &&  a.DeviceId == deviceId).FirstOrDefaultAsync();
                 if (issuedLicense == null)
                 {
                     issuedLicense = new LicenseIssued
                     {
-                        LicenseId = license.Id,
+                        ActiveLicenseId = license.Id,
                         DeviceId = deviceId,
                         RequestAddress = HttpContext.Connection.RemoteIpAddress.ToString(),
                         Expiry = expiry,
