@@ -45,7 +45,7 @@ namespace McNativeMirrorServer.Model
         {
             return (from active in context.ActiveLicense
                 join resource in context.LicenseResources on active.LicenseId equals resource.LicenseId
-                where active.OrganisationId == Id && resource.Id == resourceId && !active.Disabled && (active.Expiry == null || active.Expiry > DateTime.Now)
+                where active.OrganisationId == Id && resource.ResourceId == resourceId && !active.Disabled && (active.Expiry == null || active.Expiry > DateTime.Now)
                 select active).FirstOrDefault();
         }
     }

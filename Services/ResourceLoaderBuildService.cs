@@ -70,6 +70,14 @@ namespace McNativeMirrorServer.Services
                 context.Update(loader);
                 context.SaveChanges();
                 Resource resource = loader.Resource;
+
+                if (resource == null)
+                {
+                    context.Remove(loader);
+                    context.SaveChanges();
+                    continue;
+                }
+
                 Organisation owner = resource.Owner;
                 TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description,version,resource.LoaderInstallMcNative.ToString().ToLower());
                 Thread.Sleep(2000);

@@ -31,7 +31,6 @@ namespace MirrorServer.Controllers
         [HttpGet("{name}/{edition}")]
         public async Task<ActionResult> download(string name, string edition)
         {
-
             Resource result = _context.Resources.FirstOrDefault(resource => resource.Name.ToLower().Equals(name.ToLower()));
             if (result == null || !result.Public)
             {
