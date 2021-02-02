@@ -34,6 +34,8 @@ namespace McNativeMirrorServer.Model
 
         public DbSet<SystemLoaders> SystemLoaders { get; set; }
 
+        public DbSet<ResourceDownload> ResourceDownloads { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("mcnative");
@@ -50,7 +52,7 @@ namespace McNativeMirrorServer.Model
             modelBuilder.Entity<AliveReport>().ToTable("mcnative_resource_reporting");
             modelBuilder.Entity<RolloutProfile>().ToTable("mcnative_organisation_rollout_profiles");
             modelBuilder.Entity<Template>().ToTable("mcnative_templates");
-
+            modelBuilder.Entity<ResourceDownload>().ToTable("mcnative_resource_downloads").HasKey(a => new { a.ResourceId, a.IpAddressHash }); ;
             modelBuilder.Entity<SystemLoaders>().ToTable("system_loader-build-service_loaders");
         }
 
