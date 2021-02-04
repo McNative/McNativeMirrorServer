@@ -51,7 +51,7 @@ namespace McNativeMirrorServer.Model
             modelBuilder.Entity<RolloutServer>().ToTable("mcnative_organisation_rollout_servers");
             modelBuilder.Entity<AliveReport>().ToTable("mcnative_resource_reporting");
             modelBuilder.Entity<RolloutProfile>().ToTable("mcnative_organisation_rollout_profiles");
-            modelBuilder.Entity<Template>().ToTable("mcnative_templates");
+            modelBuilder.Entity<Template>().ToTable("mcnative_template");
             modelBuilder.Entity<ResourceDownload>().ToTable("mcnative_resource_downloads").HasKey(a => new { a.ResourceId, a.IpAddressHash }); ;
             modelBuilder.Entity<SystemLoaders>().ToTable("system_loader-build-service_loaders");
         }
