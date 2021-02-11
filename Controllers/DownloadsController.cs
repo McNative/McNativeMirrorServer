@@ -123,7 +123,7 @@ namespace MirrorServer.Controllers
                     await writer2.WriteLineAsync("endpoint: " + json["endpoint"]);
                     await writer2.WriteLineAsync("template: " + json["template"]);
                     await writer2.WriteLineAsync("profile: " + json["profile"]);
-                    await writer2.WriteLineAsync("localProfile: ");
+                    //await writer2.WriteLineAsync("localProfile: ");
                 }
 
                 ReplaceName(archive,"plugin.yml", json["name"].ToString());

@@ -24,6 +24,7 @@ namespace McNativeMirrorServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>options.AddPolicy("AllowAllOrigins",builder => builder.AllowAnyOrigin()));
             services.AddDbContext<ResourceContext>(options => options.UseLazyLoadingProxies().UseMySql(Environment.GetEnvironmentVariable("PRETRONIC_DATABASE")));
             services.AddControllers().AddNewtonsoftJson(options => {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
@@ -46,10 +47,7 @@ namespace McNativeMirrorServer
 
             app.UseCors(builder =>
             {
-                builder
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
+                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
             });
 
             app.UseHttpsRedirection();
