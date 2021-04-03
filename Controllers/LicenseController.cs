@@ -23,7 +23,19 @@ namespace MirrorServer.Controllers
         {
             _context = context;
         }
-        
+
+        [HttpGet("download/{key}")]
+        public async Task<IActionResult> Download(string key)
+        {
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream, Encoding.UTF8);
+            await writer.WriteAsync(key);
+            await writer.FlushAsync();
+            stream.Seek(0, SeekOrigin.Begin);
+            return File(stream, "application/octet-stream","license.dat");
+        }
+
+
         [HttpGet("{resourceId}/checkout")]
         public async Task<IActionResult> Checkout(string resourceId, [FromHeader] string deviceId,
             [FromHeader] string networkId, [FromHeader] string networkSecret
@@ -84,12 +96,16 @@ namespace MirrorServer.Controllers
                 properties.set("Id", issuedLicense.Id);
                 properties.set("Issuer", "licensing.mcnative.org");
                 properties.set("CheckoutTime", now.Ticks);
-                properties.set("OrganisationId", license.OrganisationId);
-                properties.set("OrganisationName", license.Organisation.Name);
+                if (license.OrganisationId != null)
+                {
+                    properties.set("OrganisationId", license.OrganisationId);
+                    properties.set("OrganisationName", license.Organisation.Name);
+                }
                 properties.set("DeviceId", deviceId);
                 properties.set("ResourceId", resourceId);
                 properties.set("Expiry", expiry.Ticks);
                 properties.set("PreferredRefreshTime", preferredRefreshTime.Ticks);
+                properties.set("Comment", license.Comment);
 
                 var bytes = Encoding.UTF8.GetBytes(properties.ToString());
                 var base64 = Convert.ToBase64String(bytes);

@@ -22,6 +22,8 @@ namespace McNativeMirrorServer.Model
 
         public DateTime? Expiry { get; set; }
 
+        public string Comment { get; set; }
+
         [ForeignKey("LicenseId")]
         public virtual License License { get; set; }
 
