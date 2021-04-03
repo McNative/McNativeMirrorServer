@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using McNativeMirrorServer.Services;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Pomelo.EntityFrameworkCore.MySql.Storage;
 
 namespace McNativeMirrorServer
 {
@@ -25,7 +27,10 @@ namespace McNativeMirrorServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors(options =>options.AddPolicy("AllowAllOrigins",builder => builder.AllowAnyOrigin()));
-            services.AddDbContext<ResourceContext>(options => options.UseLazyLoadingProxies().UseMySql(Environment.GetEnvironmentVariable("PRETRONIC_DATABASE")));
+            services.AddDbContext<ResourceContext>(options => options.UseLazyLoadingProxies()
+                .UseMySql(Environment.GetEnvironmentVariable("PRETRONIC_DATABASE"),
+                    mySqlOptions => mySqlOptions.CharSet(CharSet.Latin1)
+                ));
             services.AddControllers().AddNewtonsoftJson(options => {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
