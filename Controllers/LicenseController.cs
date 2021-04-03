@@ -40,7 +40,9 @@ namespace MirrorServer.Controllers
         public async Task<IActionResult> Checkout(string resourceId, [FromHeader] string deviceId,
             [FromHeader] string networkId, [FromHeader] string networkSecret
             ,[FromHeader] string rolloutServerId, [FromHeader] string rolloutServerSecret
-            ,[FromHeader] string licenseKey) {
+            ,[FromHeader] string licenseKey)
+        {
+            if (deviceId == null) return BadRequest();
             Resource resource = _context.Resources.SingleOrDefault(resource => resource.Id.Equals(resourceId));
             if (resource == null)
             {
@@ -105,7 +107,7 @@ namespace MirrorServer.Controllers
                 properties.set("ResourceId", resourceId);
                 properties.set("Expiry", expiry.Ticks);
                 properties.set("PreferredRefreshTime", preferredRefreshTime.Ticks);
-                properties.set("Comment", license.Comment);
+                if(license.Comment != null) properties.set("Comment", license.Comment);
 
                 var bytes = Encoding.UTF8.GetBytes(properties.ToString());
                 var base64 = Convert.ToBase64String(bytes);
