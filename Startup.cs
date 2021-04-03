@@ -28,9 +28,7 @@ namespace McNativeMirrorServer
         {
             services.AddCors(options =>options.AddPolicy("AllowAllOrigins",builder => builder.AllowAnyOrigin()));
             services.AddDbContext<ResourceContext>(options => options.UseLazyLoadingProxies()
-                .UseMySql(Environment.GetEnvironmentVariable("PRETRONIC_DATABASE"),
-                    mySqlOptions => mySqlOptions.CharSet(CharSet.Latin1)
-                ));
+                .UseMySql(Environment.GetEnvironmentVariable("PRETRONIC_DATABASE")));
             services.AddControllers().AddNewtonsoftJson(options => {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;

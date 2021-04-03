@@ -17,6 +17,9 @@ namespace MirrorServer.Controllers
     [Route("resources/v1/licenses")]
     public class LicenseController : Controller
     {
+
+
+        private readonly Encoding UTF8 = new UTF8Encoding(false);
         private readonly ResourceContext _context;
         
         public LicenseController(ResourceContext context)
@@ -28,11 +31,12 @@ namespace MirrorServer.Controllers
         public async Task<IActionResult> Download(string key)
         {
             MemoryStream stream = new MemoryStream();
-            StreamWriter writer = new StreamWriter(stream, Encoding.UTF8);
+            StreamWriter writer = new StreamWriter(stream, UTF8);
             await writer.WriteAsync(key);
             await writer.FlushAsync();
             stream.Seek(0, SeekOrigin.Begin);
-            return File(stream, "application/octet-stream","license.key");
+            Encoding utf8WithoutBom = new UTF8Encoding(false);
+            return File(stream, "application/octet-stream","license.key" );
         }
 
 
