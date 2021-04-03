@@ -32,7 +32,7 @@ namespace MirrorServer.Controllers
             await writer.WriteAsync(key);
             await writer.FlushAsync();
             stream.Seek(0, SeekOrigin.Begin);
-            return File(stream, "application/octet-stream","license.dat");
+            return File(stream, "application/octet-stream","license.key");
         }
 
 
