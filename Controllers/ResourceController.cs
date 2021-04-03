@@ -73,7 +73,7 @@ namespace MirrorServer.Controllers
         [HttpGet("{resourceId}/versions/{buildId}/download")]
         public async Task<ActionResult> DownloadVersion(string resourceId,int buildId,string edition
             ,[FromHeader] string networkId, [FromHeader] string networkSecret
-            , [FromHeader] string rolloutServerId, [FromHeader] string rolloutServerSecret,string licenseKey) {
+            , [FromHeader] string rolloutServerId, [FromHeader] string rolloutServerSecret, [FromHeader] string licenseKey) {
             Resource resource = await _context.Resources.FirstOrDefaultAsync(resource => resource.Id.Equals(resourceId));
             if (resource == null )return NotFound();
 
