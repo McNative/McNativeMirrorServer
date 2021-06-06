@@ -21,6 +21,9 @@ namespace McNativeMirrorServer.Model
         public string Secret { get; set; }
 
         [JsonIgnore]
+        public string SecretHash { get; set; }
+
+        [JsonIgnore]
         [ForeignKey("OrganisationId")]
         public virtual Organisation? Organisation { get; set; }
     }
