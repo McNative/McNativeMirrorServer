@@ -18,7 +18,7 @@ namespace McNativeMirrorServer.Controllers
             _context = context;
         }
 
-        [HttpGet]
+        [HttpGet("checkout")]
         public async Task<IActionResult> Checkout([FromHeader] string rolloutServerId, [FromHeader] string rolloutServerSecret, [FromHeader] string rolloutServerEndpoint)
         { 
             if(rolloutServerId == null || rolloutServerSecret == null) return Unauthorized("Missing or wrong authentication credentials");
@@ -36,13 +36,13 @@ namespace McNativeMirrorServer.Controllers
             string organisation = organisation0.Id;
 
             var templates = _context.Templates.Where(o => o.OrganisationId == organisation)
-                .Select(o => new { o.Id, o.Name, Configuration = JObject.Parse(o.Configuration),Defintion = o.TemplateDefinition }).ToList();
+                .Select(o => new { o.Id, o.Name, Configuration = JObject.Parse(o.Configuration), Definition = o.TemplateDefinition }).ToList();
 
             var profiles = _context.Profiles.Where(o => o.OrganisationId == organisation)
-                .Select(o => new { o.Id, o.Name, Configuration = JObject.Parse(o.Configuration),Defintion = o.ProfileDefinition }).ToList();
+                .Select(o => new { o.Id, o.Name, Configuration = JObject.Parse(o.Configuration), Definition = o.ProfileDefinition }).ToList();
 
             var credentials = _context.Servers.Where(o => o.OrganisationId == organisation)
-                .Select(o => new { o.Id, hash = o.SecretHash }).ToList();
+                .Select(o => new { o.Id, Hash = o.SecretHash }).ToList();
 
             return Ok(new {templates,profiles,credentials});
         }
