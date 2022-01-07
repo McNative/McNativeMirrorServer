@@ -66,7 +66,7 @@ namespace MirrorServer.Controllers
             HttpContext.Request.Headers.TryGetValue("CF-IPCountry", out var country);
             await Task.Run(() => IncrementDownload(result.Id, address, country));
 
-            return File(memory, "application/java-archive", result.Name.ToLower().Replace(" ", "_") + ".jar");
+            return File(memory, MediaTypeNames.Application.Zip, result.Name.ToLower().Replace(" ", "_") + ".jar");
         }
 
         [HttpGet("id/{id}")]
@@ -98,7 +98,7 @@ namespace MirrorServer.Controllers
             HttpContext.Request.Headers.TryGetValue("CF-IPCountry", out var country);
             await Task.Run(() => IncrementDownload(result.Id, address, country));
 
-            return File(memory, "application/java-archive", result.Name.ToLower().Replace(" ", "_") + ".jar");
+            return File(memory, MediaTypeNames.Application.Zip, result.Name.ToLower().Replace(" ", "_") + ".jar");
         }
 
         [HttpPost("custom")]
