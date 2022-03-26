@@ -38,50 +38,57 @@ namespace McNativeMirrorServer.Services
 
         private void Execute(object state)
         {
-            using var scope = _scopeFactory.CreateScope();
-            ResourceContext context = scope.ServiceProvider.GetRequiredService<ResourceContext>();
-
-            string version = GetLatestLoaderVersion();
-
-            IQueryable<string> loaders = context.SystemLoaders.Select(l => l.ResourceId);
-            List<Resource> resources = context.Resources.Where(r => (r.Public || r.BuildLoader) && !loaders.Contains(r.Id)).Take(1000).ToList();//@Todo Temp solution, change to partial loading
-
-            foreach (Resource resource in resources)
+            try
             {
-                SystemLoaders loader = new SystemLoaders
-                {
-                    ResourceId = resource.Id,
-                    Version = version,
-                    Status = "RUNNING",
-                    FirstBuild = null,
-                    LastBuild = null
-                }; 
-                context.Add(loader);
-                context.SaveChanges();
-                Organisation owner = resource.Owner;
-                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description, version, resource.LoaderInstallMcNative.ToString().ToLower());
-                Thread.Sleep(2000);
-            }
+                using var scope = _scopeFactory.CreateScope();
+                ResourceContext context = scope.ServiceProvider.GetRequiredService<ResourceContext>();
 
-            List<SystemLoaders> loadersToUpdate = context.SystemLoaders.Where(l => l.Version != version).Take(1000).ToList();
-            foreach (SystemLoaders loader in loadersToUpdate)
-            {
-                loader.Version = version;
-                loader.Status = "Running";
-                context.Update(loader);
-                context.SaveChanges();
-                Resource resource = loader.Resource;
+                string version = GetLatestLoaderVersion();
 
-                if (resource == null)
+                IQueryable<string> loaders = context.SystemLoaders.Select(l => l.ResourceId);
+                List<Resource> resources = context.Resources.Where(r => (r.Public || r.BuildLoader) && !loaders.Contains(r.Id)).Take(1000).ToList();//@Todo Temp solution, change to partial loading
+
+                foreach (Resource resource in resources)
                 {
-                    context.Remove(loader);
+                    SystemLoaders loader = new SystemLoaders
+                    {
+                        ResourceId = resource.Id,
+                        Version = version,
+                        Status = "RUNNING",
+                        FirstBuild = null,
+                        LastBuild = null
+                    };
+                    context.Add(loader);
                     context.SaveChanges();
-                    continue;
+                    Organisation owner = resource.Owner;
+                    TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description, version, resource.LoaderInstallMcNative.ToString().ToLower());
+                    Thread.Sleep(2000);
                 }
 
-                Organisation owner = resource.Owner;
-                TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description,version,resource.LoaderInstallMcNative.ToString().ToLower());
-                Thread.Sleep(2000);
+                List<SystemLoaders> loadersToUpdate = context.SystemLoaders.Where(l => l.Version != version).Take(1000).ToList();
+                foreach (SystemLoaders loader in loadersToUpdate)
+                {
+                    loader.Version = version;
+                    loader.Status = "Running";
+                    context.Update(loader);
+                    context.SaveChanges();
+                    Resource resource = loader.Resource;
+
+                    if (resource == null)
+                    {
+                        context.Remove(loader);
+                        context.SaveChanges();
+                        continue;
+                    }
+
+                    Organisation owner = resource.Owner;
+                    TriggerBuild(resource.Name, resource.Id, owner.Name, owner.Website, resource.Description, version, resource.LoaderInstallMcNative.ToString().ToLower());
+                    Thread.Sleep(2000);
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
             }
 
         }
